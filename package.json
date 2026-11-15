@@ -1,0 +1,23 @@
+{
+  "name": "gatekeeper-agent",
+  "version": "1.0.0",
+  "description": "Proof Gatekeeper agent for zkVerify Agent Games — deterministic Groth16 gatekeeper (Node.js, no framework)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "probe": "node scripts/probe-proof.mjs",
+    "test": "node scripts/test-harness.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "circomlibjs": "^0.1.7",
+    "js-sha3": "^0.14.0",
+    "snarkjs": "^0.7.6"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  }
+}

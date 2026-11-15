@@ -1,0 +1,10 @@
+node_modules/
+.env
+state/
+*.log
+.DS_Store
+# Circuit binaries are fetched at image build time from the official /build
+# page (hash-verified); they are not stored in the repo (binary, unpushable
+# via the GitHub connector).
+artifacts/*.wasm
+artifacts/*.zkey
