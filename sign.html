@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>Tanda tangan make.fun</title>
+    <style>
+      :root {
+        --bg: #0b0e14;
+        --panel: #141926;
+        --panel-2: #1a2133;
+        --border: #2a3350;
+        --text: #eef1f8;
+        --muted: #9aa6c2;
+        --accent: #e0238c;
+        --accent-dark: #b3126c;
+        --ok: #3ddc97;
+        --warn: #ffb454;
+        --err: #ff6b6b;
+        --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+      }
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 20px 16px 48px;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 4px 0 6px;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin: 0 0 20px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0 0 10px;
+      }
+      .change-text {
+        font-size: 1.05rem;
+        font-weight: 600;
+        word-break: break-word;
+      }
+      pre.msg {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+      .empty {
+        color: var(--warn);
+        font-size: 0.95rem;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: none;
+        border-radius: 12px;
+        min-height: 44px;
+      }
+      #signBtn {
+        display: block;
+        width: 100%;
+        min-height: 60px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--accent);
+        padding: 14px 20px;
+        margin: 4px 0 10px;
+      }
+      #signBtn:active { background: var(--accent-dark); }
+      #signBtn:disabled { opacity: 0.55; cursor: default; }
+      .note {
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-align: center;
+        margin: 0 0 16px;
+      }
+      .status {
+        display: none;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+        word-break: break-word;
+      }
+      .status.show { display: block; }
+      .status.info { background: var(--panel-2); border: 1px solid var(--border); }
+      .status.err { background: rgba(255, 107, 107, 0.12); border: 1px solid var(--err); color: #ffd7d7; }
+      .status.ok { background: rgba(61, 220, 151, 0.1); border: 1px solid var(--ok); color: #d9ffee; }
+      .status ol { margin: 8px 0 0; padding-left: 20px; }
+      .status li { margin: 4px 0; }
+      #resultCard { display: none; }
+      #resultCard.show { display: block; }
+      textarea.sig {
+        width: 100%;
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--text);
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        resize: none;
+        word-break: break-all;
+      }
+      textarea.paste {
+        width: 100%;
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--text);
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        resize: vertical;
+        word-break: break-all;
+      }
+      textarea.paste::placeholder { color: var(--muted); }
+      #usePasteBtn {
+        width: 100%;
+        margin-top: 10px;
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px;
+        min-height: 52px;
+      }
+      #usePasteBtn:active { background: var(--border); }
+      #copyBtn {
+        width: 100%;
+        margin-top: 10px;
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px;
+        min-height: 52px;
+      }
+      #copyBtn:active { background: var(--border); }
+      .wallet-line {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--muted);
+        word-break: break-all;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Tanda tangani pesan make.fun</h1>
+      <p class="sub">Halaman ini hanya menandatangani pesan di bawah — tidak mengirim transaksi dan tidak ada fee.</p>
+
+      <section class="card" id="changeCard" hidden>
+        <h2>Yang berubah</h2>
+        <div class="change-text" id="changeText"></div>
+      </section>
+
+      <section class="card">
+        <h2>Pesan yang ditandatangani</h2>
+        <pre class="msg" id="msgBox"></pre>
+        <p class="empty" id="emptyMsg" hidden>Pesan kosong — tempel pesan baru di kotak bawah, lalu tekan <b>Pakai pesan ini</b>.</p>
+      </section>
+
+      <section class="card">
+        <h2>Atau tempel pesan lain</h2>
+        <textarea class="paste" id="pasteBox" rows="4" placeholder="Tempel pesan di sini, lalu tekan tombol di bawah…"></textarea>
+        <button id="usePasteBtn" type="button">Pakai pesan ini</button>
+      </section>
+
+      <button id="signBtn" type="button">Sign with Phantom</button>
+      <p class="note">Tidak ada transaksi, tidak ada fee. Wallet kamu menandatangani teks persis di atas.</p>
+
+      <div class="status" id="statusBox" role="status"></div>
+
+      <section class="card" id="resultCard">
+        <h2>Signature (base58)</h2>
+        <textarea class="sig" id="sigBox" rows="3" readonly></textarea>
+        <button id="copyBtn" type="button">Salin signature</button>
+        <div class="wallet-line" id="walletLine"></div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        // ---------- Pesan bawaan (dipakai kalau ?message= tidak ada) ----------
+        var DEFAULT_MESSAGE = "";
+
+        // ---------- Baca pesan dari ?message= (parameter tetap menang) ----------
+        var params = new URLSearchParams(window.location.search);
+        var message = params.get("message") || DEFAULT_MESSAGE;
+
+        var msgBox = document.getElementById("msgBox");
+        var emptyMsg = document.getElementById("emptyMsg");
+        var changeCard = document.getElementById("changeCard");
+        var changeText = document.getElementById("changeText");
+        var signBtn = document.getElementById("signBtn");
+        var statusBox = document.getElementById("statusBox");
+        var resultCard = document.getElementById("resultCard");
+        var sigBox = document.getElementById("sigBox");
+        var copyBtn = document.getElementById("copyBtn");
+        var walletLine = document.getElementById("walletLine");
+        var pasteBox = document.getElementById("pasteBox");
+        var usePasteBtn = document.getElementById("usePasteBtn");
+
+        // ---------- Tampilkan pesan aktif + ringkasan "Change: ..." ----------
+        function renderMessage() {
+          if (message) {
+            msgBox.textContent = message;
+            msgBox.style.display = "";
+            emptyMsg.hidden = true;
+            signBtn.disabled = false;
+          } else {
+            msgBox.style.display = "none";
+            emptyMsg.hidden = false;
+            signBtn.disabled = true;
+          }
+
+          changeCard.hidden = true;
+          if (message) {
+            var idx = message.indexOf("Change:");
+            if (idx !== -1) {
+              var rest = message.slice(idx + "Change:".length);
+              var end = rest.indexOf(";");
+              var change = (end === -1 ? rest : rest.slice(0, end)).trim();
+              if (change) {
+                changeText.textContent = change;
+                changeCard.hidden = false;
+              }
+            }
+          }
+        }
+        renderMessage();
+
+        // ---------- Kotak tempel: pakai pesan dari textarea ----------
+        usePasteBtn.addEventListener("click", function () {
+          var pasted = pasteBox.value.trim();
+          if (!pasted) {
+            showStatus("Tempel dulu pesannya di kotak di atas, baru tekan tombol ini.", "info");
+            return;
+          }
+          message = pasted;
+          renderMessage();
+          hideStatus();
+          resultCard.classList.remove("show");
+          showStatus("Pesan tempelan sekarang jadi pesan yang ditandatangani. Cek isinya di atas, lalu tekan Sign with Phantom.", "ok");
+        });
+
+        function showStatus(html, kind) {
+          statusBox.innerHTML = html;
+          statusBox.className = "status show " + (kind || "info");
+        }
+        function hideStatus() {
+          statusBox.className = "status";
+          statusBox.innerHTML = "";
+        }
+
+        // ---------- Base58 (ditulis sendiri, tanpa library) ----------
+        var B58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+        function base58Encode(bytes) {
+          if (!bytes || bytes.length === 0) return "";
+          // Hitung nol di depan -> jadi karakter '1'
+          var zeros = 0;
+          while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
+          // Konversi basis 256 -> basis 58
+          var digits = [0];
+          for (var i = zeros; i < bytes.length; i++) {
+            var carry = bytes[i];
+            for (var j = 0; j < digits.length; j++) {
+              carry += digits[j] << 8;
+              digits[j] = carry % 58;
+              carry = (carry / 58) | 0;
+            }
+            while (carry > 0) {
+              digits.push(carry % 58);
+              carry = (carry / 58) | 0;
+            }
+          }
+          var out = "";
+          for (var z = 0; z < zeros; z++) out += "1";
+          for (var d = digits.length - 1; d >= 0; d--) out += B58_ALPHABET[digits[d]];
+          return out;
+        }
+
+        function getProvider() {
+          if (window.phantom && window.phantom.solana) return window.phantom.solana;
+          if (window.solana) return window.solana;
+          return null;
+        }
+
+        // ---------- Tombol tanda tangan ----------
+        signBtn.addEventListener("click", function () {
+          hideStatus();
+          resultCard.classList.remove("show");
+
+          var provider = getProvider();
+          if (!provider || typeof provider.signMessage !== "function") {
+            showStatus(
+              "<b>Phantom tidak ditemukan di browser ini.</b>" +
+              "<ol>" +
+              "<li>Salin tautan halaman ini.</li>" +
+              "<li>Buka aplikasi <b>Phantom</b>.</li>" +
+              "<li>Buka tab <b>Browser</b> di dalam Phantom.</li>" +
+              "<li>Tempel tautan tadi di sana, lalu tekan tombol tanda tangan lagi.</li>" +
+              "</ol>",
+              "info"
+            );
+            return;
+          }
+
+          signBtn.disabled = true;
+          signBtn.textContent = "Menghubungkan…";
+
+          provider
+            .connect()
+            .then(function () {
+              signBtn.textContent = "Menunggu tanda tangan di Phantom…";
+              var encoded = new TextEncoder().encode(message);
+              return provider.signMessage(encoded, "utf8");
+            })
+            .then(function (result) {
+              var sig = result && result.signature ? result.signature : result;
+              var bytes = sig instanceof Uint8Array ? sig : new Uint8Array(sig);
+              var b58 = base58Encode(bytes);
+              sigBox.value = b58;
+              var pk = provider.publicKey ? provider.publicKey.toString() : "";
+              walletLine.textContent = pk ? "Wallet: " + pk : "";
+              resultCard.classList.add("show");
+              showStatus("Berhasil ditandatangani. Salin signature di bawah dan kirimkan ke agent kamu.", "ok");
+              signBtn.textContent = "Sign with Phantom";
+              signBtn.disabled = false;
+              resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            })
+            .catch(function (err) {
+              var msg = err && err.message ? err.message : String(err);
+              if (err && (err.code === 4001 || /reject|cancel|denied/i.test(msg))) {
+                showStatus("Tanda tangan dibatalkan di Phantom. Tekan tombolnya lagi kalau mau mencoba ulang.", "info");
+              } else {
+                showStatus("Gagal menandatangani: " + msg, "err");
+              }
+              signBtn.textContent = "Sign with Phantom";
+              signBtn.disabled = false;
+            });
+        });
+
+        // ---------- Salin signature ----------
+        copyBtn.addEventListener("click", function () {
+          var text = sigBox.value;
+          function done() {
+            copyBtn.textContent = "Tersalin ✓";
+            setTimeout(function () { copyBtn.textContent = "Salin signature"; }, 2000);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              sigBox.select();
+              document.execCommand("copy");
+              done();
+            });
+          } else {
+            sigBox.select();
+            document.execCommand("copy");
+            done();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
